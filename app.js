@@ -11,6 +11,16 @@ let attempt = 1;
 let product = [];
 let showResult = document.getElementById('showResult');
 let showResultEL
+let prevLeft
+let prevMid
+let PrevRight
+let leftIndex;
+let midIndex;
+let rightIndex;
+let cuSet = [];
+let productnameArr = [];
+let votesArr = [];
+let viewsArr = [];
 
 
 
@@ -20,6 +30,7 @@ function ProductImg(productName) {
     this.votes = 0;
     this.views = 0;
     product.push(this);
+    productnameArr.push(this.pName);
 }
 
 for (let i = 0; i < productImg.length; i++) {
@@ -27,24 +38,22 @@ for (let i = 0; i < productImg.length; i++) {
 }
 
 function randomImage() {
-    return Math.floor(Math.random() * product.length);
+    return  Math.floor(Math.random() * product.length);
 }
-let leftIndex;
-let midIndex;
-let rightIndex;
 
 function renderImg() {
     leftIndex = randomImage();
     midIndex = randomImage();
     rightIndex = randomImage();
-    while (leftIndex === rightIndex || leftIndex === midIndex) 
-    {
+    while (leftIndex === rightIndex || leftIndex === midIndex || rightIndex === midIndex || cuSet.includes(leftIndex) || cuSet.includes(midIndex) || cuSet.includes(rightIndex)) {
         leftIndex = randomImage();
-    }
-    while(rightIndex === midIndex)
-    {
+        midIndex = randomImage();
         rightIndex = randomImage();
     }
+    cuSet[0] = leftIndex;
+    cuSet[1] = midIndex;
+    cuSet[2] = rightIndex;
+
     leftImg.setAttribute('src', product[leftIndex].pImg);
     midImg.setAttribute('src', product[midIndex].pImg);
     rightImg.setAttribute('src', product[rightIndex].pImg);
@@ -85,15 +94,58 @@ function clickHandler(event) {
         midImg.removeEventListener('click', clickHandler);
     }
 
+}
+
     function renderResult(event){
         event.preventDefault();
         for (let i = 0; i < product.length; i++) {
             let liEl = document.createElement('li');
             finalResult.appendChild(liEl);
             liEl.textContent = `${product[i].pName} has ${product[i].votes} votes and  ${product[i].views} views.`;
+            votesArr.push(product[i].votes);
+            viewsArr.push(product[i].views);
+            showResultEL.remove();
         }
-        showResultEL.remove();
+        chartRender()
     }
+    
 
 
+
+function chartRender() {
+    let ctx = document.getElementById('myChart').getContext('2d');
+    let myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: productnameArr,
+            datasets: [{
+                label: '# of Votes',
+                data: votesArr,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }, {
+                label: '# of views',
+                data: viewsArr,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 }
