@@ -23,6 +23,21 @@ let votesArr = [];
 let viewsArr = [];
 
 
+function saveToLocalStorage() {
+    let productData = JSON.stringify(product);    
+    localStorage.setItem('product', productData);    
+}
+
+function readFromLocalStorage() {
+    let productStringObj = localStorage.getItem('product');
+    let normalVote = JSON.parse(productStringObj);
+
+    if (normalVote) {
+        product = normalVote;
+    }
+}
+
+
 
 function ProductImg(productName) {
     this.pName = productName.split('.')[0];
@@ -41,6 +56,8 @@ function randomImage() {
     return  Math.floor(Math.random() * product.length);
 }
 
+
+//rendering Imgs
 function renderImg() {
     leftIndex = randomImage();
     midIndex = randomImage();
@@ -69,7 +86,7 @@ midImg.addEventListener('click', clickHandler);
 rightImg.addEventListener('click', clickHandler);
 
 
-
+//making Imhs clickable 
 function clickHandler(event) {
     if (attempt <= maxAttempts) {
         let clickedImage = event.target.id;
@@ -82,7 +99,8 @@ function clickHandler(event) {
         }
         renderImg();
         console.log(product);
-        attempt++;
+        attempt++;        
+        saveToLocalStorage()
     } else {
         showResultEL = document.createElement('button');
         showResultEL.textContent = 'View Results';
@@ -94,8 +112,11 @@ function clickHandler(event) {
         midImg.removeEventListener('click', clickHandler);
     }
 
+
 }
 
+
+//rendering results
     function renderResult(event){
         event.preventDefault();
         for (let i = 0; i < product.length; i++) {
@@ -111,7 +132,7 @@ function clickHandler(event) {
     
 
 
-
+//Chart
 function chartRender() {
     let ctx = document.getElementById('myChart').getContext('2d');
     let myChart = new Chart(ctx, {
@@ -149,3 +170,6 @@ function chartRender() {
         }
     });
 }
+
+
+readFromLocalStorage();
